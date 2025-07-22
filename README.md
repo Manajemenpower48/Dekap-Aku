@@ -1,2 +1,1269 @@
 # Dekap-Aku
 Aplikasi-pengendalian-dokumen-keuangan 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEKAP AKU</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #000000 0%, #166534 50%, #eab308 100%);
+        }
+        .custom-shadow {
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.1);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px -10px rgba(15, 23, 42, 0.15);
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #000000 0%, #166534 50%, #eab308 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #000000 0%, #14532d 50%, #ca8a04 100%);
+            box-shadow: 0 10px 15px -3px rgba(22, 101, 52, 0.3);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #ca8a04 0%, #eab308 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #a16207 0%, #ca8a04 100%);
+            box-shadow: 0 10px 15px -3px rgba(202, 138, 4, 0.3);
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+        }
+        .status-badge::before {
+            content: '';
+            display: inline-block;
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        /* Updated status colors for new options */
+        .status-kurang-stempel-ttd,
+        .status-dokumen-tidak-lengkap,
+        .status-perlu-verifikasi { /* Updated class name */
+            background: linear-gradient(135deg, rgba(153, 27, 27, 0.15) 0%, rgba(220, 38, 38, 0.15) 100%);
+            color: #b91c1c;
+        }
+        .status-kurang-stempel-ttd::before,
+        .status-dokumen-tidak-lengkap::before,
+        .status-perlu-verifikasi::before { /* Updated class name */
+            background: linear-gradient(135deg, #991b1b 0%, #dc2626 100%);
+        }
+
+        .status-dokumen-lengkap {
+            background: linear-gradient(135deg, rgba(6, 78, 59, 0.15) 0%, rgba(16, 185, 129, 0.15) 100%);
+            color: #065f46;
+        }
+        .status-dokumen-lengkap::before {
+            background: linear-gradient(135deg, #064e3b 0%, #10b981 100%);
+        }
+        /* Removed status-perlu-verifikasi as it's no longer an option */
+        .table-row-hover:hover {
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+        /* Modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.1);
+            width: 90%;
+            max-width: 500px;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="min-h-screen" style="background: linear-gradient(135deg, #000000 0%, #166534 50%, #eab308 100%)">
+    <div class="text-white" style="background: linear-gradient(135deg, #000000 0%, #166534 40%, #eab308 100%)">
+        <div class="container mx-auto py-6 px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <img src="https://iili.io/FhGgfZg.png" alt="DEKAP AKU Logo" class="h-32 mr-3" style="height: 120px;">
+                    <div>
+                        <h1 class="font-bold" style="font-size: 38px;">DEKAP AKU</h1>
+                        <p class="text-green-100">Aplikasi Pengendalian Kelengkapan Dokumen Keuangan</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex space-x-4">
+                    <div class="flex flex-col items-center bg-white bg-opacity-10 px-4 py-2 rounded-lg backdrop-blur-sm">
+                        <div class="text-xs font-medium mb-1">Pemerintah Daerah Provinsi Jawa Timur</div>
+                        <div class="text-lg font-semibold mb-1">RSUD DAHA HUSADA</div>
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span id="currentDate">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="min-h-screen flex flex-col">
+        <div class="flex items-center justify-center p-4 md:p-6 mt-8">
+            <div class="bg-white rounded-2xl custom-shadow p-6 w-full max-w-sm border-t-4 border-green-700 animate-fade-in">
+                <div class="text-center mb-5">
+                    <img src="https://iili.io/FhGgfZg.png" alt="DEKAP AKU Logo" class="mx-auto mb-2" style="height: 120px;">
+                    <h2 class="font-bold text-gray-800" style="font-size: 28px;">DEKAP AKU</h2>
+                    <p class="text-gray-600 text-sm">Silakan login untuk melanjutkan</p>
+                </div>
+                
+                <form id="loginForm" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Username</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                            <input type="text" id="username" class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-700 text-sm" placeholder="Masukkan username" required>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Password</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                            </div>
+                            <input type="password" id="password" class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-700 text-sm" placeholder="Masukkan password" required>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between text-xs">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="remember" class="h-3 w-3 text-green-700 focus:ring-green-700 border-gray-300 rounded">
+                            <label for="remember" class="ml-2 text-gray-700">Ingat saya</label>
+                        </div>
+                        <div>
+                            <a href="#" class="text-green-700 hover:text-green-900">Lupa password?</a>
+                        </div>
+                    </div>
+                    
+                    <div id="loginError" class="bg-red-50 text-red-500 p-3 rounded-lg text-xs hidden">
+                        <div class="flex">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Username atau password salah. Silakan coba lagi.
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <button type="submit" class="w-full px-4 py-2 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-offset-2 transition-colors font-medium flex items-center justify-center text-sm" style="background: linear-gradient(135deg, #000000 0%, #166534 50%, #eab308 100%)">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                            </svg>
+                            Masuk
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="mt-5 text-center text-xs text-gray-600">
+                    <p>© 2023 Aplikasi Dekap Aku. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="container mx-auto p-4 md:p-6 hidden">
+        <!-- Dashboard Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div class="bg-white rounded-xl custom-shadow p-6 card-hover">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-lg" style="background: linear-gradient(135deg, #000000 0%, #166534 100%)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-gray-500 text-sm">Total Dokumen</h3>
+                        <p class="text-2xl font-bold text-gray-800" id="totalDocuments">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl custom-shadow p-6 card-hover">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-lg" style="background: linear-gradient(135deg, #064e3b 0%, #10b981 100%)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-gray-500 text-sm">Dokumen Lengkap</h3>
+                        <p class="text-2xl font-bold text-gray-800" id="completeDocuments">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl custom-shadow p-6 card-hover">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-lg" style="background: linear-gradient(135deg, #854d0e 0%, #eab308 100%)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-gray-500 text-sm">Perlu Perhatian</h3>
+                        <p class="text-2xl font-bold text-gray-800" id="attentionDocuments">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Status Chart -->
+        <div class="bg-white rounded-xl custom-shadow p-6 mb-6">
+            <div class="flex items-center"> <!-- Removed mb-4 from here -->
+                <div class="bg-green-100 p-2 rounded-lg mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-800">Grafik Status Dokumen</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4"> <!-- Added mt-4 here -->
+                <div class="md:col-span-2">
+                    <div class="bg-slate-50 rounded-lg p-4 h-64 flex items-center justify-center">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <div class="bg-slate-50 rounded-lg h-64 pt-6 px-4 pb-4"> <!-- Changed p-4 to pt-6 px-4 pb-4 -->
+                        <h3 class="text-lg font-medium text-gray-800 mb-3">Distribusi Status</h3>
+                        <div id="statusLegend" class="space-y-3">
+                            <!-- Legend will be dynamically generated here -->
+                        </div>
+                        
+                        <!-- Removed the summary section -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Input Dokumen -->
+        <div class="bg-white rounded-xl custom-shadow p-6 mb-6">
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center">
+                    <div class="bg-green-100 p-2 rounded-lg mr-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                    </div>
+                    <h2 class="text-xl font-semibold text-gray-800">Input Dokumen Baru</h2>
+                </div>
+                <div class="relative" id="userMenu">
+                    <button id="userMenuButton" class="flex items-center space-x-2 px-4 py-2 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-green-700 transition-colors">
+                        <div class="bg-green-700 h-8 w-8 rounded-full flex items-center justify-center text-white font-medium" id="userInitial">U</div>
+                        <div class="flex flex-col items-start">
+                            <span id="usernameDisplay" class="font-medium text-gray-800">User</span>
+                            <span class="text-xs text-gray-500" id="userRoleDisplay">Administrator</span>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="userDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-10 hidden">
+                        <div class="px-4 py-3 border-b border-gray-100">
+                            <p class="text-sm text-gray-500">Logged in as</p>
+                            <p class="font-medium text-gray-900" id="userRoleDisplayDropdown">Administrator</p>
+                        </div>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile Settings</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Help & Support</a>
+                        <button id="logoutButton" class="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <form id="documentForm" class="space-y-5">
+                <input type="hidden" id="docId"> <!-- Hidden input for document ID when editing -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nomor Dokumen</label>
+                        <input type="text" id="docNumber" class="w-full px-4 py-3 border border-green-700 bg-green-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-700" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Dokumen</label>
+                        <input type="date" id="docDate" class="w-full px-4 py-3 border border-green-700 bg-green-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-700" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Penanggungjawab Dokumen</label>
+                        <select id="docResponsible" class="w-full px-4 py-3 border border-green-700 bg-green-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-700" required>
+                            <option value="">Pilih Penanggungjawab</option>
+                            <option value="PPKOM">PPKOM</option>
+                            <option value="PPTK">PPTK</option>
+                            <option value="Bendahara Pengeluaran">Bendahara Pengeluaran</option>
+                            <option value="Bendahara Penerimaan">Bendahara Penerimaan</option>
+                            <option value="Petugas/Kurir">Petugas/Kurir</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tujuan Dokumen</label> <!-- Changed from Nama Rekanan -->
+                        <input type="text" id="docProvider" class="w-full px-4 py-3 border border-green-700 bg-green-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-700" placeholder="Masukkan Tujuan Dokumen"> <!-- Updated placeholder -->
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama PIC</label>
+                        <input type="text" id="docPosition" class="w-full px-4 py-3 border border-green-700 bg-green-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-700" placeholder="Masukkan Nama PIC">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Dikirim</label>
+                        <input type="date" id="docSentDate" class="w-full px-4 py-3 border border-green-700 bg-green-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-700">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Dokumen</label>
+                        <input type="text" id="docType" class="w-full px-4 py-3 border border-green-700 bg-green-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-700" placeholder="Masukkan Jenis Dokumen" required>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
+                        <textarea id="docDescription" rows="3" class="w-full px-4 py-3 border border-green-700 bg-green-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-700"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Diterima Kembali</label>
+                        <input type="date" id="docReturnDate" class="w-full px-4 py-3 border border-green-700 bg-green-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-700">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nilai Kontrak</label>
+                        <input type="number" id="docValue" class="w-full px-4 py-3 border border-green-700 bg-green-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-700" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                        <select id="docStatus" class="w-full px-4 py-3 border border-green-700 bg-green-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-700" required>
+                            <option value="">Pilih Status</option>
+                            <option value="Kurang Stempel & TTD">Kurang Stempel & TTD</option>
+                            <option value="Dokumen Tidak Lengkap">Dokumen Tidak Lengkap</option>
+                            <option value="Dokumen Lengkap">Dokumen Lengkap</option>
+                            <option value="Perlu Verifikasi">Perlu Verifikasi</option> <!-- Updated option -->
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="submit" class="px-6 py-3 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-offset-2 transition-colors flex items-center" style="background: linear-gradient(135deg, #000000 0%, #166534 50%, #eab308 100%)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Simpan Dokumen
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Daftar Dokumen -->
+        <div class="bg-white rounded-xl custom-shadow p-6">
+            <div class="mb-6">
+                <div class="flex items-center mb-4">
+                    <div class="bg-green-100 p-2 rounded-lg mr-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <h2 class="text-xl font-semibold text-gray-800">Daftar Dokumen</h2>
+                </div>
+                
+                <div class="bg-slate-50 p-4 rounded-lg mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="w-full md:w-1/2">
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Cari</label>
+                        <input type="text" id="searchDocs" placeholder="Cari dokumen..." class="w-full px-3 py-2 border border-green-700 bg-green-50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-700">
+                    </div>
+                    <div class="relative w-full md:w-auto" id="printByStatusDropdown">
+                        <button id="printByStatusBtn" class="w-full md:w-auto px-4 py-2 text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-green-700 text-sm flex items-center justify-center" style="background: linear-gradient(135deg, #000000 0%, #166534 50%, #eab308 100%)">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2z" />
+                            </svg>
+                            Cetak Status
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div id="printStatusOptions" class="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg py-1 z-10 hidden">
+                            <button class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-status="Dokumen Lengkap">Cetak Status Dokumen Lengkap</button>
+                            <button class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-status="Dokumen Tidak Lengkap">Cetak Status Dokumen Tidak Lengkap</button>
+                            <button class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-status="Kurang Stempel & TTD">Cetak Status Kurang Stempel & TTD</button>
+                            <button class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-status="Perlu Verifikasi">Cetak Status Perlu Verifikasi</button> <!-- Updated option -->
+                            <button class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-status="Semua">Cetak Semua Status</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto rounded-lg border border-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-slate-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nomor Dokumen</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jenis</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tujuan Dokumen</th> <!-- Changed from Nama Rekanan -->
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama PIC</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nilai Kontrak</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tgl Dikirim</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tgl Kembali</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="documentList" class="bg-white divide-y divide-gray-200">
+                            <!-- Data akan diisi oleh JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="emptyState" class="text-center py-12 hidden">
+                    <div class="bg-slate-50 p-8 rounded-lg inline-block">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <p class="mt-4 text-slate-600 font-medium">Belum ada dokumen yang tersimpan</p>
+                        <p class="text-slate-500 text-sm mt-1">Tambahkan dokumen baru menggunakan form di atas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Delete Confirmation -->
+    <div id="deleteConfirmationModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Konfirmasi Hapus Dokumen</h3>
+            <p class="text-gray-700 mb-6">Apakah Anda yakin ingin menghapus dokumen ini? Tindakan ini tidak dapat dibatalkan.</p>
+            <div class="flex justify-end space-x-3">
+                <button id="cancelDeleteButton" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">Batal</button>
+                <button id="confirmDeleteButton" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Success Message -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Berhasil!</h3>
+            <p id="successMessage" class="text-gray-700 mb-6">Dokumen berhasil disimpan.</p>
+            <div class="flex justify-end">
+                <button id="closeSuccessModalButton" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Error Message -->
+    <div id="errorModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3 class="text-lg font-semibold text-red-600 mb-4">Terjadi Kesalahan!</h3>
+            <p id="errorMessage" class="text-gray-700 mb-6">Terjadi kesalahan saat memproses permintaan Anda.</p>
+            <div class="flex justify-end">
+                <button id="closeErrorModalButton" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module">
+        // Firebase imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc, deleteDoc, onSnapshot, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables for Firebase and application data
+        let app;
+        let db;
+        let auth;
+        let documents = []; // Array to store document data
+        let statusChart; // Chart.js instance
+
+        // Firebase configuration and initialization
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // Initialize Firebase when the window loads
+        window.onload = async function() {
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Authenticate user
+                if (typeof __initial_auth_token !== 'undefined') {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                // Listen for auth state changes
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        // userId is now directly used from auth.currentUser.uid in Firestore operations
+                        console.log("User authenticated:", user.uid);
+                        // Update user display (using a placeholder for now, as real user data isn't in this example)
+                        updateUserDisplay("Admin", "Administrator"); // Default user display
+                        loadDocuments(); // Load documents after successful authentication
+                        displayCurrentDate(); // Display current date
+                    } else {
+                        console.log("No user authenticated.");
+                        toggleLoginScreen(true); // Show login screen if not authenticated
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error initializing Firebase or authenticating:", error);
+                showModal('errorModal', 'Terjadi kesalahan saat memulai aplikasi. Silakan coba lagi nanti.');
+            }
+        };
+
+        // --- Utility Functions ---
+
+        /**
+         * Displays the current date in the header.
+         */
+        function displayCurrentDate() {
+            const dateElement = document.getElementById('currentDate');
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            dateElement.textContent = new Date().toLocaleDateString('id-ID', options);
+        }
+
+        /**
+         * Toggles the visibility of the login screen and the main application.
+         * @param {boolean} showLogin - True to show login, false to show main app.
+         */
+        function toggleLoginScreen(showLogin) {
+            document.getElementById('loginScreen').classList.toggle('hidden', !showLogin);
+            document.getElementById('mainApp').classList.toggle('hidden', showLogin);
+        }
+
+        /**
+         * Shows a modal dialog with a message.
+         * @param {string} modalId - The ID of the modal element.
+         * @param {string} message - The message to display in the modal.
+         */
+        function showModal(modalId, message) {
+            const modal = document.getElementById(modalId);
+            const messageElement = modal.querySelector(`#${modalId === 'successModal' ? 'successMessage' : 'errorMessage'}`);
+            if (messageElement) {
+                messageElement.textContent = message;
+            }
+            modal.style.display = 'flex'; // Use flex to center content
+        }
+
+        /**
+         * Hides a modal dialog.
+         * @param {string} modalId - The ID of the modal element.
+         */
+        function hideModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // --- User Authentication and Display ---
+
+        /**
+         * Handles the login form submission.
+         * @param {Event} event - The form submission event.
+         */
+        async function handleLogin(event) {
+            event.preventDefault();
+            const usernameInput = document.getElementById('username').value;
+            const passwordInput = document.getElementById('password').value;
+            const loginError = document.getElementById('loginError');
+
+            // Simple hardcoded login for demonstration
+            if (usernameInput === 'admin' && passwordInput === 'admin123') {
+                loginError.classList.add('hidden');
+                // In a real app, you'd sign in with Firebase Auth here
+                // For this example, we assume signInWithCustomToken or signInAnonymously already handled auth
+                toggleLoginScreen(false); // Show main app
+            } else {
+                loginError.classList.remove('hidden');
+            }
+        }
+
+        /**
+         * Handles the logout action.
+         */
+        async function handleLogout() {
+            try {
+                await auth.signOut();
+                console.log("User logged out.");
+                toggleLoginScreen(true); // Show login screen
+            } catch (error) {
+                console.error("Error logging out:", error);
+                showModal('errorModal', 'Terjadi kesalahan saat logout. Silakan coba lagi.');
+            }
+        }
+
+        /**
+         * Updates the user display in the header and dropdown.
+         * @param {string} username - The username to display.
+         * @param {string} role - The user's role to display.
+         */
+        function updateUserDisplay(username, role) {
+            document.getElementById('usernameDisplay').textContent = username;
+            document.getElementById('userRoleDisplay').textContent = role;
+            document.getElementById('userInitial').textContent = username.charAt(0).toUpperCase();
+            document.getElementById('userRoleDisplayDropdown').textContent = role;
+        }
+
+        // --- Document Management (Firestore Integration) ---
+
+        /**
+         * Loads documents from Firestore and sets up a real-time listener.
+         */
+        function loadDocuments() {
+            // Ensure auth.currentUser is available before proceeding
+            if (!db || !auth.currentUser) {
+                console.warn("Firestore atau pengguna yang diautentikasi tidak tersedia. Tidak dapat memuat dokumen.");
+                return;
+            }
+
+            const documentsCollectionPath = `artifacts/${appId}/users/${auth.currentUser.uid}/documents`;
+            console.log("Mencoba memuat dokumen dari jalur:", documentsCollectionPath, "untuk userId:", auth.currentUser.uid);
+
+            const documentsCollectionRef = collection(db, documentsCollectionPath);
+            // Use onSnapshot for real-time updates
+            onSnapshot(documentsCollectionRef, (snapshot) => {
+                console.log("Dokumen berhasil dimuat.");
+                documents = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                // Sort by creation date, newest first
+                documents.sort((a, b) => (b.createdAt?.toDate() || 0) - (a.createdAt?.toDate() || 0)); 
+                renderDocuments();
+                updateDashboardStats();
+                updateStatusChart();
+            }, (error) => {
+                console.error("Error fetching documents:", error);
+                showModal('errorModal', 'Gagal memuat dokumen. Silakan refresh halaman.');
+            });
+        }
+
+        /**
+         * Adds a new document or updates an existing one in Firestore.
+         * @param {Event} event - The form submission event.
+         */
+        async function addDocument(event) {
+            event.preventDefault();
+
+            // Ensure auth.currentUser is available before proceeding
+            if (!auth.currentUser) {
+                console.error("Tidak ada pengguna yang diautentikasi. Tidak dapat menambah/memperbarui dokumen.");
+                showModal('errorModal', 'Anda harus login untuk menyimpan dokumen.');
+                return;
+            }
+
+            const docId = document.getElementById('docId').value;
+            const docNumber = document.getElementById('docNumber').value;
+            const docDate = document.getElementById('docDate').value;
+            const docResponsible = document.getElementById('docResponsible').value;
+            const docProvider = document.getElementById('docProvider').value; // Now "Tujuan Dokumen"
+            const docPosition = document.getElementById('docPosition').value;
+            const docSentDate = document.getElementById('docSentDate').value;
+            const docType = document.getElementById('docType').value; // Now manual text input
+            const docDescription = document.getElementById('docDescription').value;
+            const docReturnDate = document.getElementById('docReturnDate').value; // Get value from new input
+            const docValue = parseFloat(document.getElementById('docValue').value);
+            const docStatus = document.getElementById('docStatus').value;
+            
+
+            const documentData = {
+                docNumber,
+                docDate,
+                docResponsible,
+                docProvider,
+                docPosition,
+                docSentDate,
+                docType,
+                docDescription,
+                docReturnDate, // Use the new input for return date
+                docValue,
+                docStatus,
+                userId: auth.currentUser.uid, // Store the userId with the document, directly from auth.currentUser.uid
+                updatedAt: serverTimestamp()
+            };
+
+            try {
+                if (docId) {
+                    // Update existing document
+                    const docRef = doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/documents`, docId);
+                    await updateDoc(docRef, documentData);
+                    showModal('successModal', 'Dokumen berhasil diperbarui!');
+                } else {
+                    // Add new document
+                    documentData.createdAt = serverTimestamp(); // Add createdAt only for new documents
+                    await addDoc(collection(db, `artifacts/${appId}/users/${auth.currentUser.uid}/documents`), documentData);
+                    showModal('successModal', 'Dokumen berhasil disimpan!');
+                }
+                document.getElementById('documentForm').reset(); // Clear form
+                document.getElementById('docId').value = ''; // Clear hidden ID
+                // The onSnapshot listener will automatically re-render the list
+            } catch (e) {
+                console.error("Error adding/updating document: ", e);
+                showModal('errorModal', 'Gagal menyimpan dokumen. Silakan coba lagi.');
+            }
+        }
+
+        /**
+         * Populates the form with data of a document for editing.
+         * @param {string} id - The ID of the document to edit.
+         */
+        function editDocument(id) {
+            const documentToEdit = documents.find(doc => doc.id === id);
+            if (documentToEdit) {
+                document.getElementById('docId').value = documentToEdit.id;
+                document.getElementById('docNumber').value = documentToEdit.docNumber;
+                document.getElementById('docDate').value = documentToEdit.docDate;
+                document.getElementById('docResponsible').value = documentToEdit.docResponsible;
+                document.getElementById('docProvider').value = documentToEdit.docProvider;
+                document.getElementById('docPosition').value = documentToEdit.docPosition;
+                document.getElementById('docSentDate').value = documentToEdit.docSentDate;
+                document.getElementById('docType').value = documentToEdit.docType;
+                document.getElementById('docDescription').value = documentToEdit.docDescription;
+                document.getElementById('docReturnDate').value = documentToEdit.docReturnDate || ''; // Populate new return date input
+                document.getElementById('docValue').value = documentToEdit.docValue;
+                document.getElementById('docStatus').value = documentToEdit.docStatus;
+            }
+            // Scroll to the form
+            document.getElementById('documentForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        /**
+         * Deletes a document from Firestore.
+         * @param {string} id - The ID of the document to delete.
+         */
+        async function deleteDocument(id) {
+            // Ensure auth.currentUser is available before proceeding
+            if (!auth.currentUser) {
+                console.error("Tidak ada pengguna yang diautentikasi. Tidak dapat menghapus dokumen.");
+                showModal('errorModal', 'Anda harus login untuk menghapus dokumen.');
+                return;
+            }
+            // Store the ID temporarily for confirmation
+            document.getElementById('confirmDeleteButton').dataset.docId = id;
+            showModal('deleteConfirmationModal', 'Apakah Anda yakin ingin menghapus dokumen ini? Tindakan ini tidak dapat dibatalkan.');
+        }
+
+        /**
+         * Confirms and proceeds with document deletion.
+         */
+        async function confirmDelete() {
+            const id = document.getElementById('confirmDeleteButton').dataset.docId;
+            hideModal('deleteConfirmationModal'); // Hide confirmation modal
+
+            // Ensure auth.currentUser is available before proceeding
+            if (!auth.currentUser) {
+                console.error("Tidak ada pengguna yang diautentikasi. Tidak dapat mengkonfirmasi penghapusan dokumen.");
+                showModal('errorModal', 'Anda harus login untuk menghapus dokumen.');
+                return;
+            }
+
+            try {
+                await deleteDoc(doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/documents`, id));
+                showModal('successModal', 'Dokumen berhasil dihapus!');
+                // The onSnapshot listener will automatically re-render the list
+            } catch (e) {
+                console.error("Error deleting document: ", e);
+                showModal('errorModal', 'Gagal menghapus dokumen. Silakan coba lagi.');
+            }
+        }
+
+        /**
+         * Updates the status of a document in Firestore.
+         * @param {string} id - The ID of the document to update.
+         * @param {string} newStatus - The new status.
+         */
+        async function updateDocumentStatus(id, newStatus) {
+            // Ensure auth.currentUser is available before proceeding
+            if (!auth.currentUser) {
+                console.error("Tidak ada pengguna yang diautentikasi. Tidak dapat memperbarui status dokumen.");
+                showModal('errorModal', 'Anda harus login untuk memperbarui status dokumen.');
+                return;
+            }
+            try {
+                const docRef = doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/documents`, id);
+                await updateDoc(docRef, {
+                    docStatus: newStatus,
+                    updatedAt: serverTimestamp()
+                });
+                showModal('successModal', 'Status dokumen berhasil diperbarui!');
+                // The onSnapshot listener will automatically re-render the list
+            } catch (e) {
+                console.error("Error updating document status: ", e);
+                showModal('errorModal', 'Gagal memperbarui status dokumen. Silakan coba lagi.');
+            }
+        }
+
+        // --- UI Rendering and Updates ---
+
+        /**
+         * Renders the documents array into the HTML table, applying search and filter.
+         */
+        function renderDocuments() {
+            const documentList = document.getElementById('documentList');
+            documentList.innerHTML = ''; // Clear existing rows
+            const emptyState = document.getElementById('emptyState');
+
+            const searchTerm = document.getElementById('searchDocs').value.toLowerCase();
+            
+            const filteredDocuments = documents.filter(doc => {
+                const matchesSearch = (doc.docNumber && doc.docNumber.toLowerCase().includes(searchTerm)) ||
+                                      (doc.docDescription && doc.docDescription.toLowerCase().includes(searchTerm)) ||
+                                      (doc.docProvider && doc.docProvider.toLowerCase().includes(searchTerm)) ||
+                                      (doc.docType && doc.docType.toLowerCase().includes(searchTerm)); 
+                
+                return matchesSearch; 
+            });
+
+            if (filteredDocuments.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                filteredDocuments.forEach((doc, index) => {
+                    const row = documentList.insertRow();
+                    row.classList.add('table-row-hover');
+
+                    // Determine the CSS class for the status badge based on the new statuses
+                    let statusClass = '';
+                    switch (doc.docStatus) {
+                        case 'Dokumen Lengkap':
+                            statusClass = 'status-dokumen-lengkap';
+                            break;
+                        case 'Kurang Stempel & TTD':
+                        case 'Dokumen Tidak Lengkap':
+                        case 'Perlu Verifikasi': // Updated case
+                            statusClass = 'status-kurang-stempel-ttd'; // Group these under a general "tidak lengkap" style
+                            break;
+                        default:
+                            statusClass = 'status-dokumen-tidak-lengkap'; // Default for undefined or unexpected
+                    }
+
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${index + 1}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${doc.docNumber || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${doc.docDate || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${doc.docType || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${doc.docProvider || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${doc.docPosition || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Rp ${doc.docValue ? doc.docValue.toLocaleString('id-ID') : '0'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="status-badge ${statusClass}">
+                                ${doc.docStatus || 'Tidak Diketahui'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${doc.docSentDate || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${doc.docReturnDate || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button class="text-indigo-600 hover:text-indigo-900 mr-3 edit-btn" data-id="${doc.id}">Edit</button>
+                            <button class="text-red-600 hover:text-red-900 delete-btn" data-id="${doc.id}">Hapus</button>
+                        </td>
+                    `;
+                });
+            }
+        }
+
+        /**
+         * Updates the dashboard statistics (Total, Complete, Attention documents).
+         */
+        function updateDashboardStats() {
+            const totalDocuments = documents.length;
+            const completeDocuments = documents.filter(doc => doc.docStatus === 'Dokumen Lengkap').length;
+            // "Perlu Perhatian" now includes all non-"Dokumen Lengkap" statuses
+            const attentionDocuments = documents.filter(doc => 
+                doc.docStatus === 'Kurang Stempel & TTD' || 
+                doc.docStatus === 'Dokumen Tidak Lengkap' || 
+                doc.docStatus === 'Perlu Verifikasi' // Updated condition
+            ).length;
+
+            document.getElementById('totalDocuments').textContent = totalDocuments;
+            document.getElementById('completeDocuments').textContent = completeDocuments;
+            document.getElementById('attentionDocuments').textContent = attentionDocuments;
+        }
+
+        /**
+         * Updates the Chart.js pie chart and its legend based on all distinct document statuses.
+         */
+        function updateStatusChart() {
+            const statusCounts = {};
+            // Get all possible status options from the select element
+            const docStatusSelect = document.getElementById('docStatus');
+            const allStatusOptions = Array.from(docStatusSelect.options)
+                                          .filter(option => option.value !== '') // Exclude the "Pilih Status" option
+                                          .map(option => option.value);
+
+            // Initialize counts for all possible statuses to 0
+            allStatusOptions.forEach(status => {
+                statusCounts[status] = 0;
+            });
+
+            // Populate counts based on actual documents
+            documents.forEach(doc => {
+                if (doc.docStatus && allStatusOptions.includes(doc.docStatus)) {
+                    statusCounts[doc.docStatus]++;
+                }
+            });
+
+            const chartLabels = [];
+            const chartData = [];
+            const chartBackgroundColors = [];
+            const legendHtml = [];
+
+            // Define a consistent color map for all statuses
+            const colorMap = {
+                'Dokumen Lengkap': '#10B981', // Green
+                'Dokumen Tidak Lengkap': '#DC2626', // Red
+                'Kurang Stempel & TTD': '#EF4444', // Lighter Red
+                'Perlu Verifikasi': '#8B5CF6' // Purple for "Perlu Verifikasi"
+            };
+
+            let totalDocumentsForChart = 0;
+
+            // Prepare data for the chart and calculate total documents for percentages
+            allStatusOptions.forEach(status => {
+                const count = statusCounts[status];
+                if (count > 0) { // Only add to chart if there's data for that status
+                    chartLabels.push(status);
+                    chartData.push(count);
+                    chartBackgroundColors.push(colorMap[status]);
+                    totalDocumentsForChart += count;
+                }
+            });
+
+            // Generate dynamic legend HTML
+            allStatusOptions.forEach(status => {
+                const count = statusCounts[status];
+                const percent = totalDocumentsForChart > 0 ? ((count / totalDocumentsForChart) * 100).toFixed(1) : 0;
+                const color = colorMap[status];
+
+                legendHtml.push(`
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 rounded-full mr-2" style="background-color: ${color}"></div>
+                            <span class="text-gray-700">${status}</span>
+                        </div>
+                        <div class="font-medium text-gray-800">${count} (${percent}%)</div>
+                    </div>
+                `);
+            });
+            document.getElementById('statusLegend').innerHTML = legendHtml.join('');
+
+            // Removed the chart summary text update logic
+            // const chartSummary = document.getElementById('chartSummary');
+            // if (totalDocumentsForChart === 0) {
+            //     chartSummary.textContent = 'Belum ada data dokumen yang tersedia.';
+            // } else {
+            //     let summaryText = `Dari total ${totalDocumentsForChart} dokumen: `;
+            //     const parts = [];
+            //     allStatusOptions.forEach(status => {
+            //         const count = statusCounts[status];
+            //         const percent = totalDocumentsForChart > 0 ? ((count / totalDocumentsForChart) * 100).toFixed(1) : 0;
+            //         if (count > 0) {
+            //             parts.push(`${count} (${percent}%) ${status}`);
+            //         }
+            //     });
+            //     summaryText += parts.join(', ') + '.';
+            //     chartSummary.textContent = summaryText;
+            // }
+
+            const ctx = document.getElementById('statusChart').getContext('2d');
+            if (statusChart) {
+                statusChart.destroy(); // Destroy existing chart before creating a new one
+            }
+
+            if (typeof Chart !== 'undefined') {
+                statusChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [{
+                            data: chartData,
+                            backgroundColor: chartBackgroundColors,
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false // Hide default legend as we have a custom one
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed !== null) {
+                                            label += context.parsed;
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                console.error("Chart.js is not loaded.");
+            }
+        }
+
+        /**
+         * Prints documents based on their status.
+         * @param {string} status - The status to filter documents by. Use "Semua" to print all documents.
+         */
+        function printDocumentsByStatus(status) {
+            let documentsToPrint = [];
+            if (status === "Semua") {
+                documentsToPrint = [...documents]; // Copy all documents
+            } else {
+                documentsToPrint = documents.filter(doc => doc.docStatus === status);
+            }
+
+            if (documentsToPrint.length === 0) {
+                showModal('errorModal', `Tidak ada dokumen dengan status "${status}" untuk dicetak.`);
+                return;
+            }
+
+            let printContent = `
+                <style>
+                    body { font-family: 'Poppins', sans-serif; margin: 20px; }
+                    h1 { text-align: center; margin-bottom: 20px; color: #166534; }
+                    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 12px; }
+                    th { background-color: #f2f2f2; }
+                    .status-badge {
+                        padding: 0.25rem 0.75rem;
+                        border-radius: 9999px;
+                        font-size: 0.75rem;
+                        font-weight: 600;
+                        display: inline-flex;
+                        align-items: center;
+                    }
+                    .status-dokumen-lengkap { background-color: #D1FAE5; color: #065F46; }
+                    .status-kurang-stempel-ttd { background-color: #FEE2E2; color: #B91C1C; }
+                    .status-dokumen-tidak-lengkap { background-color: #FEE2E2; color: #B91C1C; }
+                    .status-perlu-verifikasi { background-color: #FEE2E2; color: #B91C1C; } /* Updated class name */
+                </style>
+                <h1>Daftar Dokumen Status: ${status === "Semua" ? "Semua Dokumen" : status}</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nomor Dokumen</th>
+                            <th>Tanggal</th>
+                            <th>Jenis</th>
+                            <th>Tujuan Dokumen</th>
+                            <th>Nama PIC</th>
+                            <th>Nilai Kontrak</th>
+                            <th>Status</th>
+                            <th>Tgl Dikirim</th>
+                            <th>Tgl Kembali</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            documentsToPrint.forEach((doc, index) => {
+                let statusClass = '';
+                switch (doc.docStatus) {
+                    case 'Dokumen Lengkap':
+                        statusClass = 'status-dokumen-lengkap';
+                        break;
+                    case 'Kurang Stempel & TTD':
+                    case 'Dokumen Tidak Lengkap':
+                    case 'Perlu Verifikasi': // Updated case
+                        statusClass = 'status-kurang-stempel-ttd';
+                        break;
+                    default:
+                        statusClass = 'status-dokumen-tidak-lengkap';
+                }
+
+                printContent += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${doc.docNumber || '-'}</td>
+                        <td>${doc.docDate || '-'}</td>
+                        <td>${doc.docType || '-'}</td>
+                        <td>${doc.docProvider || '-'}</td>
+                        <td>${doc.docPosition || '-'}</td>
+                        <td>Rp ${doc.docValue ? doc.docValue.toLocaleString('id-ID') : '0'}</td>
+                        <td><span class="status-badge ${statusClass}">${doc.docStatus || 'Tidak Diketahui'}</span></td>
+                        <td>${doc.docSentDate || '-'}</td>
+                        <td>${doc.docReturnDate || '-'}</td>
+                    </tr>
+                `;
+            });
+
+            printContent += `
+                    </tbody>
+                </table>
+            `;
+
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        // --- Event Listeners ---
+
+        // Login form submission
+        document.getElementById('loginForm').addEventListener('submit', handleLogin);
+
+        // User menu dropdown toggle
+        document.getElementById('userMenuButton').addEventListener('click', () => {
+            document.getElementById('userDropdown').classList.toggle('hidden');
+        });
+
+        // Close user menu dropdown if clicked outside
+        window.addEventListener('click', (event) => {
+            const userMenu = document.getElementById('userMenu');
+            const userDropdown = document.getElementById('userDropdown');
+            if (!userMenu.contains(event.target) && !userDropdown.classList.contains('hidden')) {
+                userDropdown.classList.add('hidden');
+            }
+        });
+
+        // Logout button
+        document.getElementById('logoutButton').addEventListener('click', handleLogout);
+
+        // Document form submission
+        document.getElementById('documentForm').addEventListener('submit', addDocument);
+
+        // Search input
+        document.getElementById('searchDocs').addEventListener('input', renderDocuments);
+
+        // Print by status dropdown toggle
+        document.getElementById('printByStatusBtn').addEventListener('click', () => {
+            document.getElementById('printStatusOptions').classList.toggle('hidden');
+        });
+
+        // Close print by status dropdown if clicked outside
+        window.addEventListener('click', (event) => {
+            const printDropdown = document.getElementById('printByStatusDropdown');
+            const printOptions = document.getElementById('printStatusOptions');
+            if (!printDropdown.contains(event.target) && !printOptions.classList.contains('hidden')) {
+                printOptions.classList.add('hidden');
+            }
+        });
+
+        // Print by status options
+        document.querySelectorAll('#printStatusOptions button').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const status = event.target.dataset.status;
+                printDocumentsByStatus(status);
+                document.getElementById('printStatusOptions').classList.add('hidden'); // Hide dropdown after selection
+            });
+        });
+
+        // Event delegation for Edit and Delete buttons on the document list
+        document.getElementById('documentList').addEventListener('click', (event) => {
+            if (event.target.classList.contains('edit-btn')) {
+                const docId = event.target.dataset.id;
+                editDocument(docId);
+            } else if (event.target.classList.contains('delete-btn')) {
+                const docId = event.target.dataset.id;
+                deleteDocument(docId);
+            }
+        });
+
+        // Modal close buttons
+        document.querySelectorAll('.modal .close-button').forEach(button => {
+            button.addEventListener('click', (event) => {
+                hideModal(event.target.closest('.modal').id);
+            });
+        });
+        document.getElementById('cancelDeleteButton').addEventListener('click', () => hideModal('deleteConfirmationModal'));
+        document.getElementById('confirmDeleteButton').addEventListener('click', confirmDelete);
+        document.getElementById('closeSuccessModalButton').addEventListener('click', () => hideModal('successModal'));
+        document.getElementById('closeErrorModalButton').addEventListener('click', () => hideModal('errorModal')); 
+        
+        // Close modal if clicked outside content
+        window.addEventListener('click', (event) => {
+            const deleteModal = document.getElementById('deleteConfirmationModal');
+            const successModal = document.getElementById('successModal');
+            const errorModal = document.getElementById('errorModal');
+
+            if (event.target === deleteModal) {
+                hideModal('deleteConfirmationModal');
+            }
+            if (event.target === successModal) {
+                hideModal('successModal');
+            }
+            if (event.target === errorModal) {
+                hideModal('errorModal');
+            }
+        });
+    </script>
+</body>
+</html>
